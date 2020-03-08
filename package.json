@@ -1,6 +1,6 @@
 {
   "name": "pr-to-changesets",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Create changesets content from Pull Request.",
   "keywords": [
     "changesets",
