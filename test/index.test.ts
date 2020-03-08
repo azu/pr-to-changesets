@@ -2,7 +2,7 @@ import { createChangesets } from "../src/pr-to-changesets";
 import path from "path";
 import * as assert from "assert";
 
-describe('createChangesets', function () {
+describe("createChangesets", function() {
     it("is example", async () => {
         // https://github.com/secretlint/secretlint/pull/78
         const changesets = await createChangesets({
@@ -15,8 +15,9 @@ describe('createChangesets', function () {
             minorLabels: ["Type: Feature"],
             patchLabels: ["Type: Bug"]
         });
-        console.log(changesets);
-        assert.strictEqual(changesets, `---
+        assert.strictEqual(
+            changesets.replace(/\r?\n/g, "\n"),
+            `---
 "@secretlint/config-loader": minor
 "@secretlint/node": minor
 "@secretlint/profiler": minor
@@ -31,6 +32,7 @@ This feature is useful for in-memory linting like history scanner https://github
 \`\`\`
 git filter-branch --tree-filter 'secretlint --secretlintrcJSON "$(cat .secretlintrc.json)" "**/*" --debug"' --all
 \`\`\`
-`)
-    })
+`
+        );
+    });
 });
