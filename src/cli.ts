@@ -15,8 +15,8 @@ export const cli = meow(
       --token             [Required] GitHub Token. you can use als GITHUB_TOKEN env
       --pullRequestNumber [Required] GitHub Pull Request Number
       --majorLabels major [Required] labels split by comma. Default: "Semver: major"
-      --minorLabels minor [Required] labels split by comma. Default: "Semver: minor"]
-      --patchLabels patch [Required] labels split by comma. Default: "Semver: minor"]
+      --minorLabels minor [Required] labels split by comma. Default: "Semver: minor"
+      --patchLabels patch [Required] labels split by comma. Default: "Semver: patch"
       --rootDir           monorepo root dir. Default: current working dir
       --output            Path to output. Default: stdout
       --baseUrl           GitHub API base Url.
@@ -88,15 +88,17 @@ export const run = (_input = cli.input, flags = cli.flags) => {
         patchLabels: splitByComma(flags.patchLabels) ?? config.patchLabels,
         pullRequestNumber: flags.pullRequestNumber,
         baseUrl: flags.baseUrl ?? config.baseUrl,
-        token: flags.token ?? config.token ?? process.env.GITHUB_TOKEN,
-    }).then((output) => {
-        if (flags.output) {
-            fs.writeFileSync(flags.output, output, "utf-8");
-            return {exitStatus: 0, stderr: null, stdout: ""};
-        } else {
-            return {exitStatus: 0, stderr: null, stdout: output};
-        }
-    }).catch(error => {
-        return {exitStatus: 1, stderr: error, stdout: null}
-    });
+        token: flags.token ?? config.token ?? process.env.GITHUB_TOKEN
+    })
+        .then(output => {
+            if (flags.output) {
+                fs.writeFileSync(flags.output, output, "utf-8");
+                return { exitStatus: 0, stderr: null, stdout: "" };
+            } else {
+                return { exitStatus: 0, stderr: null, stdout: output };
+            }
+        })
+        .catch(error => {
+            return { exitStatus: 1, stderr: error, stdout: null };
+        });
 };
