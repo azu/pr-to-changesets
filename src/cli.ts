@@ -1,5 +1,5 @@
 import meow from "meow";
-import { createChangesets, createChangesetsOptions } from "./pr-to-changesets";
+import { createChangesets, createChangesetsOptions, SemverType } from "./pr-to-changesets";
 import { parseConfig } from "./config-parse";
 import path from "path";
 import * as fs from "fs";
@@ -7,23 +7,25 @@ import * as fs from "fs";
 export const cli = meow(
     `
     Usage
-      $ pr-to-changesets
+      $ pr-to-changesets [options]
  
     Options
       --owner             [Required] Owner name for repository: **owner**/repo
       --repo              [Required] Repo name for repository: owner/**repo**
       --token             [Required] GitHub Token. you can use als GITHUB_TOKEN env
       --pullRequestNumber [Required] GitHub Pull Request Number
-      --majorLabels major [Required] labels split by comma. Default: "Semver: major"
-      --minorLabels minor [Required] labels split by comma. Default: "Semver: minor"
-      --patchLabels patch [Required] labels split by comma. Default: "Semver: patch"
+      --majorLabels       [Required] labels split by comma. Default: "Semver: major"
+      --minorLabels       [Required] labels split by comma. Default: "Semver: minor"
+      --patchLabels       [Required] labels split by comma. Default: "Semver: patch"
+      --defaultSemVer     Default Semver when no match any labels. Default: patch
       --rootDir           monorepo root dir. Default: current working dir
       --output            Path to output. Default: stdout
       --baseUrl           GitHub API base Url.
       --config            Path to config file
  
     Examples
-      $ pr-to-changesets
+      # Get https://github.com/secretlint/secretlint/pull/78 and output changesets content in secretlint project dir
+      $ GITHUB_TOKEN=xxx pr-to-changesets --owner secretlint --repo secretlint --pullRequestNumber 78
 `,
     {
         flags: {
@@ -43,6 +45,9 @@ export const cli = meow(
                 type: "string"
             },
             patchLabels: {
+                type: "string"
+            },
+            defaultSemVer: {
                 type: "string"
             },
             rootDir: {
@@ -86,6 +91,7 @@ export const run = (_input = cli.input, flags = cli.flags) => {
         majorLabels: splitByComma(flags.majorLabels) ?? config.majorLabels,
         minorLabels: splitByComma(flags.minorLabels) ?? config.minorLabels,
         patchLabels: splitByComma(flags.patchLabels) ?? config.patchLabels,
+        defaultSemVer: (flags.defaultSemVer ?? config.defaultSemVer) as SemverType | undefined,
         pullRequestNumber: flags.pullRequestNumber,
         baseUrl: flags.baseUrl ?? config.baseUrl,
         token: flags.token ?? config.token ?? process.env.GITHUB_TOKEN

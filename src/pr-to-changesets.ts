@@ -1,4 +1,4 @@
-import { Octokit } from "@octokit/rest"
+import { Octokit } from "@octokit/rest";
 import { getPackages } from "@monorepo-utils/package-utils";
 import path from "path";
 import conventionalCommitsParser from "conventional-commits-parser";
@@ -29,12 +29,13 @@ export type createChangesetsOptions = {
     /**
      * GitHub API's base URL
      */
-    baseUrl?: string
+    baseUrl?: string;
     // Labels for semver
     majorLabels: string[];
     minorLabels: string[];
     patchLabels: string[];
-}
+    defaultSemVer?: SemverType;
+};
 const fetchPullRequest = async (options: createChangesetsOptions) => {
     const octokit = new Octokit({
         auth: options.token,
@@ -48,25 +49,34 @@ const fetchPullRequest = async (options: createChangesetsOptions) => {
 };
 
 export type SemverType = "patch" | "minor" | "major";
-type ConvertOptions = { title: string, body: string, url: string, packageNames: string[], semver: SemverType; pullRequestNumber: number };
-const convertToMarkdownWithYaml = ({title, body, url, packageNames, semver, pullRequestNumber}: ConvertOptions) => {
+type ConvertOptions = {
+    title: string;
+    body: string;
+    url: string;
+    packageNames: string[];
+    semver: SemverType;
+    pullRequestNumber: number;
+};
+const convertToMarkdownWithYaml = ({ title, body, url, packageNames, semver, pullRequestNumber }: ConvertOptions) => {
     const titleAsConventionalCommit = conventionalCommitsParser.sync(title);
 
     const scope = titleAsConventionalCommit.scope ? `${titleAsConventionalCommit.scope}: ` : "";
     const subject = titleAsConventionalCommit.subject ?? title;
     return `---
-${packageNames.map(name => {
-        return `"${name}": ${semver}`
-    }).join("\n")}
+${packageNames
+    .map(name => {
+        return `"${name}": ${semver}`;
+    })
+    .join("\n")}
 ---
     
 ${scope}${subject} [#${String(pullRequestNumber)}](${url})
     
 ${body}
-`
+`;
 };
 export type calculateSemverFromLabelsOptions = {
-    labels: string[],
+    labels: string[];
     defaultSemVer?: SemverType;
     majorLabels: string[];
     minorLabels: string[];
@@ -80,11 +90,11 @@ export const calculateSemverFromLabels = (options: calculateSemverFromLabelsOpti
     if (options.labels.some(label => majorTypes.includes(label))) {
         return "major";
     } else if (options.labels.some(label => minorTypes.includes(label))) {
-        return "minor"
+        return "minor";
     } else if (options.labels.some(label => patchTypes.includes(label))) {
-        return "patch"
+        return "patch";
     }
-    return defaultSemVer
+    return defaultSemVer;
 };
 export const fetchChangedPackagesInPullRequests = async (options: createChangesetsOptions): Promise<Set<string>> => {
     const octokit = new Octokit({
@@ -103,12 +113,12 @@ export const fetchChangedPackagesInPullRequests = async (options: createChangese
             relativePath: path.relative(options.rootDir, pkgInfo.location),
             location: pkgInfo.location,
             packageJSON: pkgInfo.packageJSON
-        }
+        };
     });
     const changedResultSet: Set<string> = new Set();
     files.forEach(file => {
         const foundPackage = packages.find(pkg => {
-            return file.filename.startsWith(pkg.relativePath)
+            return file.filename.startsWith(pkg.relativePath);
         });
         if (foundPackage && foundPackage.packageJSON.name) {
             changedResultSet.add(foundPackage.packageJSON.name);
@@ -126,6 +136,7 @@ export const createChangesets = async (options: createChangesetsOptions) => {
             majorLabels: options.majorLabels,
             minorLabels: options.minorLabels,
             patchLabels: options.patchLabels,
+            defaultSemVer: options.defaultSemVer,
             labels: response.data.labels.map(label => label.name)
         }),
         url: response.data.html_url,
