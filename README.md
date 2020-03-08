@@ -32,7 +32,6 @@ Install with [npm](https://www.npmjs.com/):
       # Get https://github.com/secretlint/secretlint/pull/78 and output changesets content in secretlint project dir
       $ GITHUB_TOKEN=xxx pr-to-changesets --owner secretlint --repo secretlint --pullRequestNumber 78
 
-
 ## config file
 
 Config file is partial object of pr-to-changesets.
