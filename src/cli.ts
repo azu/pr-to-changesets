@@ -75,7 +75,10 @@ export const cli = meow(
     }
 );
 
-const splitByComma = (str: string) => {
+const splitByComma = (str?: string) => {
+    if (!str) {
+        return [];
+    }
     return str.split(",");
 };
 
