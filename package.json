@@ -1,0 +1,77 @@
+{
+  "name": "pr-to-changesets",
+  "version": "1.0.0",
+  "description": "Create changesets content from Pull Request.",
+  "keywords": [
+    "changesets",
+    "pullrequest",
+    "github",
+    "actions"
+  ],
+  "homepage": "https://github.com/azu/pr-to-changesets",
+  "bugs": {
+    "url": "https://github.com/azu/pr-to-changesets/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/azu/pr-to-changesets.git"
+  },
+  "license": "MIT",
+  "author": "azu",
+  "files": [
+    "bin/",
+    "lib/",
+    "src/"
+  ],
+  "main": "lib/pr-to-changesets.js",
+  "types": "lib/pr-to-changesets.d.ts",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "build": "cross-env NODE_ENV=production tsc -p .",
+    "clean": "rimraf lib/",
+    "prettier": "prettier --write \"**/*.{js,jsx,ts,tsx,css}\"",
+    "prepublish": "npm run --if-present build",
+    "test": "dotenv mocha \"test/**/*.ts\"",
+    "watch": "tsc -p . --watch"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,css}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "prettier": {
+    "printWidth": 120,
+    "singleQuote": false,
+    "tabWidth": 4
+  },
+  "devDependencies": {
+    "@types/conventional-commits-parser": "^3.0.0",
+    "@types/mocha": "^7.0.2",
+    "@types/node": "^13.9.0",
+    "cross-env": "^7.0.2",
+    "dotenv-cli": "^3.1.0",
+    "husky": "^4.2.3",
+    "lint-staged": "^10.0.8",
+    "mocha": "^7.1.0",
+    "prettier": "^1.19.1",
+    "rimraf": "^3.0.2",
+    "ts-node": "^8.6.2",
+    "ts-node-test-register": "^8.0.1",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "@monorepo-utils/package-utils": "^2.0.3",
+    "@octokit/rest": "^17.0.0",
+    "conventional-commits-parser": "^3.0.8",
+    "meow": "^6.0.1"
+  }
+}
