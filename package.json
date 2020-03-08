@@ -25,6 +25,9 @@
   ],
   "main": "lib/pr-to-changesets.js",
   "types": "lib/pr-to-changesets.d.ts",
+  "bin": {
+    "pr-to-changesets": "bin/cmd.js"
+  },
   "directories": {
     "lib": "lib",
     "test": "test"
